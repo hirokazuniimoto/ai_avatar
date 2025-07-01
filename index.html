@@ -26,7 +26,7 @@
         transform: translateX(-50%);
         width: 100vw;
         height: 100vh;
-        overflow: hidden; /* Prevent content from overflowing */
+        overflow: hidden;
       }
 
       #unity-container {
@@ -49,10 +49,64 @@
         width: 100%;
         height: 100%;
       }
+
+      /* 🔽 入力エリアとボタンのデザイン */
+      #input-controls {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      #speak-input {
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        width: 200px;
+      }
+
+      .speak-btn {
+        padding: 6px 14px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .speak-btn.speak {
+        background-color: #5cb85c;
+        color: white;
+      }
+
+      .speak-btn.stop {
+        background-color: #d9534f;
+        color: white;
+      }
     </style>
   </head>
+
   <body>
-    <!-- Fullscreen parent div -->
+    <!-- 🔽 ユーザー入力とボタン -->
+    <div id="input-controls">
+      <input
+        id="speak-input"
+        type="text"
+        placeholder="ここに話す内容を入力"
+      />
+      <button class="speak-btn speak" onclick="sendSpeak()">話す</button>
+      <button class="speak-btn stop" onclick="sendStop()">止める</button>
+    </div>
+
+    <!-- Unity WebGL コンテナ -->
     <div id="unity-parent">
       <div id="unity-container">
         <canvas id="unity-canvas" tabindex="-1" style="display: none"></canvas>
@@ -68,8 +122,6 @@
           <div id="unity-fullscreen-button"></div>
           <div id="unity-build-title">AIToolkitTest</div>
         </div>
-
-        <!-- Add this new div for the Powered by MuFIN text -->
         <div id="powered-by" style="display: none">Powered by MuFIN</div>
       </div>
     </div>
@@ -77,5 +129,28 @@
     <script src="script/loader.js"></script>
     <script src="script/speakHandler.js"></script>
     <script src="script/test.js"></script>
+
+    <!-- 🔽 入力テキスト送信スクリプト -->
+    <script>
+      function sendSpeak() {
+        const input = document.getElementById("speak-input");
+        const text = input.value.trim();
+        if (!text) return;
+        // Unity WebGL のメッセージ受け取りに送信
+        // window.postMessage(
+        //   {
+        //     action: "unitySpeak",
+        //     message: text,
+        //     voice: "ja-JP-NanamiNeural", // ← 日本語の音声設定
+        //   },
+        //   "*"
+        // );
+        unitySpeak(text, "ja-JP-NanamiNeural");
+      }
+
+      function sendStop() {
+        window.postMessage({ action: "stopSpeaking" }, "*");
+      }
+    </script>
   </body>
 </html>
