@@ -157,10 +157,11 @@
 
     <!-- 🔽 入力テキスト送信スクリプト -->
     <script>
-      function sendSpeak() {
+      function sendSpeak(text) {
         const input = document.getElementById("speak-input");
-        const text = input.value.trim();
-        if (!text) return;
+        const inputText = input.value.trim();
+        // if (!text) return;
+        if (!inputText && !text) return;
         // Unity WebGL のメッセージ受け取りに送信
         // window.postMessage(
         //   {
