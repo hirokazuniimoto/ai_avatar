@@ -50,46 +50,68 @@
         height: 100%;
       }
 
-      /* 🔽 入力エリアとボタンのデザイン */
+      /* 🔽 入力エリアとボタンのデザイン（下部固定・大きめ・重なり防止） */
       #input-controls {
-        position: absolute;
-        top: 20px;
+        position: fixed;
+        bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        z-index: 2000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 18px 20px 18px 20px;
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.18);
         display: flex;
-        gap: 8px;
+        gap: 16px;
         align-items: center;
+        width: 100vw;
+        max-width: 480px;
       }
 
       #speak-input {
-        padding: 6px 10px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        width: 200px;
+        padding: 12px 16px;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 1.5px solid #bbb;
+        width: 220px;
+        flex: 1;
       }
 
       .speak-btn {
-        padding: 6px 14px;
-        font-size: 14px;
+        height: 48px;
+        min-width: 48px;
+        padding: 0 18px;
+        font-size: 20px;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
       }
 
-      .speak-btn.speak {
-        background-color: #5cb85c;
+      .speak-btn.mic {
+        background-color: #4285f4;
         color: white;
       }
-
+      .speak-btn.mic.listening {
+        background-color: #fbbc05;
+        color: #333;
+      }
+      .mic-icon {
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+      }
       .speak-btn.stop {
         background-color: #d9534f;
         color: white;
+      }
+      .speak-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
     </style>
   </head>
@@ -102,8 +124,10 @@
         type="text"
         placeholder="ここに話す内容を入力"
       />
-      <button class="speak-btn speak" onclick="sendSpeak()">話す</button>
-      <button class="speak-btn stop" onclick="sendStop()">止める</button>
+      <button class="speak-btn mic" id="mic-btn" title="音声入力" onclick="toggleMic()">
+        <svg class="mic-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 14 0zM11 21h2v-2h-2v2z"/></svg>
+      </button>
+      <button class="speak-btn stop" onclick="sendStop()">停止</button>
     </div>
 
     <!-- Unity WebGL コンテナ -->
@@ -151,6 +175,52 @@
       function sendStop() {
         window.postMessage({ action: "stopSpeaking" }, "*");
       }
+
+      // 音声入力用スクリプト
+      let recognition;
+      let recognizing = false;
+      const micBtn = document.getElementById('mic-btn');
+      const speakInput = document.getElementById('speak-input');
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        recognition.onstart = function() {
+          recognizing = true;
+          micBtn.classList.add('listening');
+          micBtn.title = '認識中...クリックで停止';
+        };
+        recognition.onend = function() {
+          recognizing = false;
+          micBtn.classList.remove('listening');
+          micBtn.title = '音声入力';
+        };
+        recognition.onresult = function(event) {
+          if (event.results.length > 0) {
+            speakInput.value = event.results[0][0].transcript;
+            sendSpeak(); // 音声入力が完了したら自動で話す
+          }
+        };
+      } else {
+        micBtn.disabled = true;
+        micBtn.title = '音声認識非対応ブラウザ';
+      }
+      function toggleMic() {
+        if (!recognition) return;
+        if (recognizing) {
+          recognition.stop();
+        } else {
+          recognition.start();
+        }
+      }
+      // エンターキーでsendSpeak実行
+      speakInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          sendSpeak();
+        }
+      });
     </script>
   </body>
 </html>
