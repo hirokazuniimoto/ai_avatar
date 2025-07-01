@@ -158,9 +158,10 @@
     <!-- 🔽 入力テキスト送信スクリプト -->
     <script>
       function sendSpeak(text) {
-        const input = document.getElementById("speak-input");
-        const inputText = input.value.trim();
-        if (!inputText && !text) return;
+        // const input = document.getElementById("speak-input");
+        // const inputText = input.value.trim();
+        // if (!inputText && !text) return;
+        if (!text) return;
         unitySpeak(text, "ja-JP-NanamiNeural");
       }
 
