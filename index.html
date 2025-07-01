@@ -6,6 +6,7 @@
     <title>VTutor | SDK</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico" />
     <link rel="stylesheet" href="TemplateData/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
       #powered-by {
         position: absolute;
@@ -100,10 +101,10 @@
         background-color: #fbbc05;
         color: #333;
       }
-      .mic-icon {
-        width: 24px;
-        height: 24px;
-        vertical-align: middle;
+      .speak-btn.mic i {
+        font-size: 24px;
+        display: block;
+        margin: auto;
       }
       .speak-btn.stop {
         background-color: #d9534f;
@@ -125,7 +126,7 @@
         placeholder="ここに話す内容を入力"
       />
       <button class="speak-btn mic" id="mic-btn" title="音声入力" onclick="toggleMic()">
-        <svg class="mic-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 14 0zM11 21h2v-2h-2v2z"/></svg>
+        <i class="fa-solid fa-microphone fa-lg"></i>
       </button>
       <button class="speak-btn stop" onclick="sendStop()">停止</button>
     </div>
